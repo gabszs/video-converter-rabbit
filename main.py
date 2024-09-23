@@ -1,22 +1,21 @@
-import asyncio
 import os
 import sys
 
-from core.dependencies import get_async_minio
+from core.dependencies import get_minio
 from core.dependencies import get_rabbitmq_channel
 from core.settings import settings
 from services import Converter
 
 
-async def main():
+def main():
     channel = get_rabbitmq_channel()
-    minio = get_async_minio()
+    minio = get_minio()
 
     converter = Converter(
         minio=minio, rabbit_channel=channel, save_bucket=settings.save_bucket, download_bucket=settings.download_bucket
     )
 
-    async def callback(channel, method, properties, body):
+    def callback(channel, method, properties, body):  # callback does not support async context
         try:
             converter(body, channel)
             channel.basic_nack(delivery_tag=method.delivery_tag)
@@ -30,7 +29,7 @@ async def main():
 
 if __name__ == "__main__":
     try:
-        asyncio.run(main())
+        main()
     except KeyboardInterrupt:
         try:
             sys.exit(0)

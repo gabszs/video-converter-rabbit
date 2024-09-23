@@ -6,7 +6,7 @@ import pika
 from pika.adapters.blocking_connection import BlockingChannel
 
 from core.dependencies import generate_short_unique_id
-from core.object_storage import AsyncMinioManager
+from core.object_storage import MinioManager
 from core.settings import settings
 from schemas.file_schema import QueueMessage
 
@@ -29,21 +29,21 @@ from schemas.file_schema import QueueMessage
 # )
 class Converter:
     def __init__(
-        self, minio: AsyncMinioManager, rabbit_channel: BlockingChannel, save_bucket: str, download_bucket: str
+        self, minio: MinioManager, rabbit_channel: BlockingChannel, save_bucket: str, download_bucket: str
     ) -> None:
         self.rabbit_channel = rabbit_channel
         self.minio = minio
         self.save_bucket = save_bucket
         self.download_bucket = download_bucket
 
-    async def __call__(self, message, channel: BlockingChannel) -> None:
+    def __call__(self, message, channel: BlockingChannel) -> None:
         message = QueueMessage.model_validate_json(message)
         message.mp3_filename = f"{message.file_name}_{generate_short_unique_id()}"
 
         with tempfile.NamedTemporaryFile(
             "w+b",
         ) as file:
-            video_mp3 = await self.minio.download_file_to_obj(
+            video_mp3 = self.minio.download_file_to_memory(
                 bucket_name=self.download_bucket, object_name=message.file_name
             )
             file.write(video_mp3)  # type: ignore
@@ -52,7 +52,7 @@ class Converter:
             audio.write_audiofile(audio_buffer, codec="mp3")
             audio_buffer.seek(0)
 
-            await self.minio.put_file(
+            self.minio.put_file(
                 bucket_name=self.save_bucket,
                 object_name=message.mp3_filename,
                 data=audio_buffer,
@@ -69,9 +69,5 @@ class Converter:
                     properties=pika.BasicProperties(delivery_mode=pika.spec.PERSISTENT_DELIVERY_MODE),
                 )
             except Exception:
-                await self.minio.delete_object(bucket_name=self.save_bucket, object_name=message.mp3_filename)
+                self.minio.delete_object(bucket_name=self.save_bucket, object_name=message.mp3_filename)
                 raise
-
-
-async def convert_to_mp3():
-    pass

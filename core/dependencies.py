@@ -4,7 +4,7 @@ import uuid
 import pika
 from pika.adapters.blocking_connection import BlockingChannel
 
-from core.object_storage import AsyncMinioManager
+from core.object_storage import MinioManager
 from core.settings import settings
 from services import Converter
 
@@ -27,13 +27,13 @@ def get_rabbitmq_channel() -> BlockingChannel:
         channel.close()
 
 
-def get_async_minio() -> AsyncMinioManager:
-    return AsyncMinioManager()
+def get_minio() -> MinioManager:
+    return MinioManager()
 
 
-async def get_converter() -> Converter:
+def get_converter() -> Converter:
     rabbit_channel = get_rabbitmq_channel()
-    minio = get_async_minio()
+    minio = get_minio()
 
     return Converter(
         minio=minio,

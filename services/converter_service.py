@@ -1,15 +1,16 @@
+import datetime
+import os
 import tempfile
-from io import BytesIO
+import uuid
+from typing import Dict
 
-import moviepy.editor
 import pika
+from audio_extract import extract_audio
 from pika.adapters.blocking_connection import BlockingChannel
 
-from core.dependencies import generate_short_unique_id
 from core.object_storage import MinioManager
 from core.settings import settings
 from schemas.file_schema import QueueMessage
-
 
 # pega a messagem que veio, e extrai o json
 # abre um arquivo temporario
@@ -25,49 +26,66 @@ from schemas.file_schema import QueueMessage
 # QueueMessage(
 #     file_name="",
 #     content_type="",
-#     mp3_filename=""
+#      mp3_filename=""
 # )
+
+video_types: Dict[str, str] = {
+    "video/mp4": ".mp4",
+    "video/x-matroska": ".mkv",  # Matroska format
+    "video/avi": ".avi",
+    "video/webm": ".webm",
+    "video/ogg": ".ogg",
+}
+
+
+def generate_short_unique_id():
+    timestamp = datetime.datetime.now().strftime("%y%m%d%H%M%S")
+    unique_part = uuid.uuid4().hex[:4]
+
+    return f"{timestamp}{unique_part}"
+
+
 class Converter:
     def __init__(
-        self, minio: MinioManager, rabbit_channel: BlockingChannel, save_bucket: str, download_bucket: str
+        self,
+        minio: MinioManager,
+        rabbit_channel: BlockingChannel,
+        audio_bucket: str = settings.audio_bucket,
+        video_bucket: str = settings.video_bucket,
     ) -> None:
         self.rabbit_channel = rabbit_channel
         self.minio = minio
-        self.save_bucket = save_bucket
-        self.download_bucket = download_bucket
+        self.audio_bucket = audio_bucket
+        self.video_bucket = video_bucket
 
-    def __call__(self, message, channel: BlockingChannel) -> None:
-        message = QueueMessage.model_validate_json(message)
-        message.mp3_filename = f"{message.file_name}_{generate_short_unique_id()}"
+    def __call__(self, queue_message: bytes, channel: BlockingChannel) -> None:
+        message = QueueMessage.model_validate_json(queue_message)
+        message.mp3_filename = f"{generate_short_unique_id()}_{message.file_name}"
+        video_type: str = video_types[message.content_type]  # type: ignore
 
-        with tempfile.NamedTemporaryFile(
-            "w+b",
-        ) as file:
-            video_mp3 = self.minio.download_file_to_memory(
-                bucket_name=self.download_bucket, object_name=message.file_name
-            )
-            file.write(video_mp3)  # type: ignore
-            audio = moviepy.editor.VideoFileClip(file.name).audio
-            audio_buffer = BytesIO()
-            audio.write_audiofile(audio_buffer, codec="mp3")
-            audio_buffer.seek(0)
+        try:
+            with tempfile.NamedTemporaryFile("w+b", suffix=".mp3", delete=False) as audio_file:
+                audio_file_name = audio_file.name
 
-            self.minio.put_file(
-                bucket_name=self.save_bucket,
-                object_name=message.mp3_filename,
-                data=audio_buffer,
-                length=audio_buffer.getbuffer().nbytes,
-                content_type="audio/mpeg",
-            )
-            audio_buffer.close()
+            with tempfile.NamedTemporaryFile(suffix=video_type) as video_file:
+                self.minio.download_file(
+                    bucket_name=self.video_bucket, object_name=message.file_name, file_path=video_file.name
+                )
 
-            try:
+                extract_audio(input_path=video_file.name, output_path=audio_file_name, overwrite=True)
+
+                self.minio.upload_file(
+                    bucket_name=self.video_bucket, object_name=message.mp3_filename, file_path=audio_file_name
+                )
+                os.remove(audio_file_name)
                 channel.basic_publish(
                     exchange="",
                     routing_key=settings.audio_queue,
-                    body=message.model_dump(),
+                    body=message.model_dump_json(),
                     properties=pika.BasicProperties(delivery_mode=pika.spec.PERSISTENT_DELIVERY_MODE),
                 )
-            except Exception:
-                self.minio.delete_object(bucket_name=self.save_bucket, object_name=message.mp3_filename)
-                raise
+        except Exception:
+            if os.path.exists(audio_file_name):
+                os.remove(audio_file_name)
+            self.minio.delete_object(bucket_name=self.audio_bucket, object_name=message.mp3_filename)
+            raise

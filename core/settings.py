@@ -14,16 +14,20 @@ class Settings(BaseSettings):
 
     auth_service_url: str
     is_prod: str
-    upload_bucket_name: str
+
     minio_endpoint: str
     minio_access_key: str
     minio_secret_key: str
     RABBIT_URL: str
 
-    save_bucket: str
-    download_bucket: str
+    audio_bucket: str
+    video_bucket: str
+
     audio_queue: str
     video_queue: str
+
+    RABBITMQ_USER: str
+    RABBITMQ_PASS: str
 
 
 settings = Settings()

@@ -42,10 +42,12 @@ class MinioManager:
         except S3Error as e:
             raise ObjectDownloadError(f"Failed to download object {object_name} from bucket {bucket_name}: {e}")
 
-    def download_file_to_memory(self, bucket_name: str, object_name: str) -> Optional[BytesIO]:
+    def download_file_to_memory(self, bucket_name: str, object_name: str, iobytes: bool = False) -> Optional[BytesIO]:
         try:
             data = self.client.get_object(bucket_name, object_name)
-            return BytesIO(data.read())
+            if iobytes:
+                return BytesIO(data.read())
+            return data.read()
         except S3Error as e:
             raise ObjectDownloadError(
                 f"Failed to download object {object_name} to memory from bucket {bucket_name}: {e}"

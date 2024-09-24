@@ -1,30 +1,32 @@
 import os
 import sys
 
+from icecream import ic
+
 from core.dependencies import get_minio
-from core.dependencies import get_rabbitmq_channel
+from core.dependencies import rabbit_connection
 from core.settings import settings
 from services import Converter
 
 
 def main():
-    channel = get_rabbitmq_channel()
     minio = get_minio()
 
-    converter = Converter(
-        minio=minio, rabbit_channel=channel, save_bucket=settings.save_bucket, download_bucket=settings.download_bucket
-    )
+    with rabbit_connection.channel() as channel:
+        converter = Converter(minio=minio, rabbit_channel=channel)
 
-    def callback(channel, method, properties, body):  # callback does not support async context
-        try:
-            converter(body, channel)
-            channel.basic_nack(delivery_tag=method.delivery_tag)
-        except Exception:
-            channel.basic_ack(delivery_tag=method.delivery_tag)
+        def callback(channel, method, properties, body):  # callback does not support async context
+            print("Received message:", body.decode())
+            try:
+                converter(body, channel)
+                channel.basic_nack(delivery_tag=method.delivery_tag)
+            except Exception as error:
+                ic(error)
+                channel.basic_ack(delivery_tag=method.delivery_tag)
 
-    channel.basic_consume(queue=settings.video_queue, on_message_callback=callback)
-
-    channel.start_consuming()
+        channel.basic_consume(queue=settings.video_queue, on_message_callback=callback)
+        print('Waiting for messages in the "video" queue. To exit press CTRL+C')
+        channel.start_consuming()
 
 
 if __name__ == "__main__":
@@ -32,6 +34,7 @@ if __name__ == "__main__":
         main()
     except KeyboardInterrupt:
         try:
+            ic("Queue interrupted")
             sys.exit(0)
         except SystemExit:
             os._exit(0)

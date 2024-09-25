@@ -12,7 +12,6 @@ env_path = None if bool(getenv("is_prod", default=False)) else "dev.env"
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=env_path, env_file_encoding="utf-8")
 
-    auth_service_url: str
     is_prod: str
 
     minio_endpoint: str

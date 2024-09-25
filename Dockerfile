@@ -25,6 +25,7 @@ COPY --from=builder ${VIRTUAL_ENV} ${VIRTUAL_ENV}
 COPY core ./core
 COPY schemas ./schemas
 COPY services ./services
+COPY main.py ./main.py
 
-EXPOSE 80
+
 CMD ["python3", "main.py"]

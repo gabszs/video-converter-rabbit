@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: converter-configmap
+data:
+  is_prod: "true"
+  VIDEO_QUEUE: "video"
+  audio_bucket: "videos-to-be-converted"
+  video_bucket: "videos-to-be-converted"
+  audio_queue: "audio_converter"
+  video_queue: "video_converter"

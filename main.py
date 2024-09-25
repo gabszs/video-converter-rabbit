@@ -13,16 +13,18 @@ def main():
     minio = get_minio()
 
     with rabbit_connection.channel() as channel:
+        channel.queue_declare(queue=settings.video_queue, durable=True)
+
         converter = Converter(minio=minio, rabbit_channel=channel)
 
         def callback(channel, method, properties, body):  # callback does not support async context
             print("Received message:", body.decode())
             try:
                 converter(body, channel)
-                channel.basic_nack(delivery_tag=method.delivery_tag)
+                channel.basic_ack(delivery_tag=method.delivery_tag)
             except Exception as error:
                 ic(error)
-                channel.basic_ack(delivery_tag=method.delivery_tag)
+                channel.basic_nack(delivery_tag=method.delivery_tag)
 
         channel.basic_consume(queue=settings.video_queue, on_message_callback=callback)
         print('Waiting for messages in the "video" queue. To exit press CTRL+C')

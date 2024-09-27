@@ -20,11 +20,14 @@ def test_file_metadata_invalid_content_type():
 def test_file_metadata_missing_file_name():
     with pytest.raises(ValidationError) as excinfo:
         FileMetadata(content_type="video/mp4")
-    assert "field required" in str(excinfo.value)
+    errors = excinfo.value.errors()
+    assert any(error["loc"] == ("file_name",) and error["type"] == "missing" for error in errors)
 
 
 def test_queue_message_valid():
-    message = QueueMessage(file_name="video.mp4", content_type="video/mp4", client_email="client@example.com")
+    message = QueueMessage(
+        file_name="video.mp4", content_type="video/mp4", client_email="client@example.com", mp3_filename=None
+    )
     assert message.file_name == "video.mp4"
     assert message.content_type == "video/mp4"
     assert message.client_email == "client@example.com"
@@ -39,5 +42,7 @@ def test_queue_message_invalid_content_type():
 
 def test_queue_message_missing_client_email():
     with pytest.raises(ValidationError) as excinfo:
-        QueueMessage(file_name="video.mp4", content_type="video/mp4")
-    assert "field required" in str(excinfo.value)
+        QueueMessage(file_name="video.mp4", content_type="video/mp4", mp3_filename=None)
+
+    assert "client_email" in str(excinfo.value)
+    assert "Field required" in str(excinfo.value)

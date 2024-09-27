@@ -33,11 +33,10 @@ requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.taskipy.tasks]
-run = 'uvicorn app.main:app --port 5555 --reload'
 lint = 'ruff .'
 pre_test = 'task lint'
-test = 'pytest -s -x --capture=no --cov=app -vv'
-verbose_test = 'pytest --verbose --show-capture=all --exitfirst --cov=app --cov-report=term-missing -vv'
+test = 'pytest -s -x --capture=no --cov=converter -vv'
+verbose_test = 'pytest --verbose --show-capture=all --exitfirst --cov=converter --cov-report=term-missing -vv'
 commit_hook = "pre-commit run --all-files"
 post_verbose_test = 'coverage html'
 post_test = 'coverage html'

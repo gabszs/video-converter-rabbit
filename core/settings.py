@@ -14,9 +14,9 @@ class Settings(BaseSettings):
 
     is_prod: str
 
-    minio_endpoint: str
-    minio_access_key: str
-    minio_secret_key: str
+    s3_endpoint: str
+    s3_access_key: str
+    s3_secret_key: str
     RABBIT_URL: str
 
     audio_bucket: str

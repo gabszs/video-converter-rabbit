@@ -67,7 +67,7 @@ class Converter:
 
     def __call__(self, queue_message: bytes, channel: BlockingChannel) -> None:
         message = QueueMessage.model_validate_json(queue_message)
-        message.mp3_filename = get_save_filename(message.file_name)
+        file_save_name = get_save_filename(message.file_name)
         video_type: str = video_types[message.content_type]  # type: ignore
 
         try:
@@ -82,7 +82,7 @@ class Converter:
                 extract_audio(input_path=video_file.name, output_path=audio_file_name, overwrite=True)
 
                 self.minio.upload_file(
-                    bucket_name=self.video_bucket, object_name=message.mp3_filename, file_path=audio_file_name
+                    bucket_name=self.video_bucket, object_name=file_save_name, file_path=audio_file_name
                 )
                 os.remove(audio_file_name)
                 channel.basic_publish(
@@ -98,5 +98,5 @@ class Converter:
         except Exception:
             if os.path.exists(audio_file_name):
                 os.remove(audio_file_name)
-            self.minio.delete_object(bucket_name=self.audio_bucket, object_name=message.mp3_filename)
+            self.minio.delete_object(bucket_name=self.audio_bucket, object_name=file_save_name)
             raise

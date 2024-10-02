@@ -2,6 +2,7 @@ from typing import Optional
 
 from pydantic import BaseModel
 from pydantic import constr
+from pydantic import EmailStr
 from pydantic import field_validator
 
 
@@ -24,5 +25,5 @@ class FileMetadata(BaseModel):
 
 
 class QueueMessage(FileMetadata):
-    client_email: str
-    mp3_filename: Optional[str]
+    client_email: EmailStr
+    download_link: Optional[str] = None

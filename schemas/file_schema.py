@@ -27,3 +27,4 @@ class FileMetadata(BaseModel):
 class QueueMessage(FileMetadata):
     client_email: EmailStr
     download_link: Optional[str]
+

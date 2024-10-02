@@ -9,7 +9,8 @@ on:
       - master
 
 env:
-  IMAGE_NAME: mp3_notification
+  IMAGE_NAME: mp3_converter
+
   DOCKER_HUB_USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}
   DOCKER_HUB_TOKEN: ${{ secrets.DOCKER_HUB_TOKEN }}
 

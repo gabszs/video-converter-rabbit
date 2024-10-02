@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "converter"
-version = "0.1.0"
+version = "0.1.1"
 description = ""
 authors = ["GabrielCarvalho <gabrielcarvalho.workk@gmail.com>"]
 readme = "README.md"
@@ -34,7 +34,6 @@ requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.taskipy.tasks]
-run = 'uvicorn app.main:app --port 5555 --reload'
 lint = 'ruff .'
 pre_test = 'task lint'
 test = 'pytest -s -x --capture=no --cov=. -vv'

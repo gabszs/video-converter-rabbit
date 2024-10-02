@@ -16,10 +16,10 @@ from core.settings import settings
 class MinioManager:
     def __init__(
         self,
-        endpoint: str = settings.minio_endpoint,
-        access_key: str = settings.minio_access_key,
-        secret_key: str = settings.minio_secret_key,
-        secure=False,
+        endpoint: str = settings.s3_endpoint,
+        access_key: str = settings.s3_access_key,
+        secret_key: str = settings.s3_secret_key,
+        secure=True,
     ) -> None:
         self.client = Minio(endpoint, access_key=access_key, secret_key=secret_key, secure=secure)
 

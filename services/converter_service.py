@@ -2,6 +2,7 @@ import datetime
 import os
 import tempfile
 import uuid
+from pathlib import Path
 from typing import Dict
 
 import pika
@@ -11,8 +12,6 @@ from pika.adapters.blocking_connection import BlockingChannel
 from core.object_storage import MinioManager
 from core.settings import settings
 from schemas.file_schema import QueueMessage
-
-from pathlib import Path
 
 # pega a messagem que veio, e extrai o json
 # abre um arquivo temporario
@@ -46,10 +45,12 @@ def generate_short_unique_id():
 
     return f"{timestamp}{unique_part}"
 
+
 def get_save_filename(message_filename: str, file_suffix: str = "mp3") -> str:
     file = Path(message_filename)
     random_id = generate_short_unique_id()
     return str(file.with_name(f"{random_id}_{file.stem}.{file_suffix}"))
+
 
 class Converter:
     def __init__(
@@ -90,7 +91,9 @@ class Converter:
                     body=message.model_dump_json(),
                     properties=pika.BasicProperties(delivery_mode=pika.spec.PERSISTENT_DELIVERY_MODE),
                 )
-                print(f"Audio file {audio_file_name} removed and message successfully sent to queue {settings.audio_queue}.")
+                print(
+                    f"Audio file {audio_file_name} removed and message successfully sent to queue {settings.audio_queue}."
+                )
 
         except Exception:
             if os.path.exists(audio_file_name):

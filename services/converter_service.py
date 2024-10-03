@@ -84,6 +84,10 @@ class Converter:
                 self.minio.upload_file(
                     bucket_name=self.video_bucket, object_name=file_save_name, file_path=audio_file_name
                 )
+
+                message.download_link = self.minio.generate_presigned_url(self.audio_bucket, file_save_name)
+                print("message.download_link", message.download_link)
+                print(message)
                 os.remove(audio_file_name)
                 channel.basic_publish(
                     exchange="",

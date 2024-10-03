@@ -1,3 +1,4 @@
+from datetime import timedelta
 from io import BytesIO
 from typing import List
 from typing import Optional
@@ -70,3 +71,12 @@ class MinioManager:
             return self.client.bucket_exists(bucket_name)
         except S3Error as e:
             raise ObjectStorageError(f"Failed to check if bucket {bucket_name} exists: {e}")
+
+    def generate_presigned_url(self, bucket_name: str, object_name: str, expiration: int = 86400) -> str:
+        """Gera uma URL presignada para o objeto especificado."""
+        try:
+            return self.client.presigned_get_object(bucket_name, object_name, expires=timedelta(seconds=expiration))
+        except S3Error as e:
+            raise ObjectStorageError(
+                f"Failed to generate presigned URL for object {object_name} in bucket {bucket_name}: {e}"
+            )

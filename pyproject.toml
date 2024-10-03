@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "converter"
-version = "0.1.6"
+version = "0.1.8"
 description = ""
 authors = ["GabrielCarvalho <gabrielcarvalho.workk@gmail.com>"]
 readme = "README.md"

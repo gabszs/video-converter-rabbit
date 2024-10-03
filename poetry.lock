@@ -254,13 +254,13 @@ tests-mypy = ["mypy (>=1.11.1)", "pytest-mypy-plugins"]
 
 [[package]]
 name = "audio-extract"
-version = "0.6.0"
+version = "0.7.0"
 description = "Extract and trim audio from videos or trim audios."
 optional = false
 python-versions = "*"
 files = [
-    {file = "audio_extract-0.6.0-py3-none-any.whl", hash = "sha256:0e1b671a9fb2d2eade368a3cba1986fa098aba9c2d8affaed353196fcf90a1dd"},
-    {file = "audio_extract-0.6.0.tar.gz", hash = "sha256:88ba707bfdbec15fd7486c26d361cd53d90f6aae575957b3663398fffca98be9"},
+    {file = "audio_extract-0.7.0-py3-none-any.whl", hash = "sha256:44495569a86e46a94d1606214d39abebc30db59ed207b8b900787c2e844a887d"},
+    {file = "audio_extract-0.7.0.tar.gz", hash = "sha256:bf8d5f48146e2d4d15778a26cede57b303f465f299621539118448bc22100dbb"},
 ]
 
 [package.dependencies]
@@ -1936,4 +1936,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.11,<=3.13"
-content-hash = "3d6b422ecfcaa06d39bcf339cf12ce991cbe3d911f3e05271f884540caeea674"
+content-hash = "62635c4d5e108ae0fd16f15df7243944e29b654c8514ca0267b51155b2e5994e"

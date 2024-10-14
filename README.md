@@ -12,6 +12,7 @@ Este projeto é um consumidor RabbitMQ que processa vídeos de uma fila, extrai 
 - **Envia uma mensagem para o serviço de notificação com o link do download**
 
 ## Estrutura do Projeto
+```bash
 C:.
 ├───.github
 │   └───workflows
@@ -19,15 +20,16 @@ C:.
 ├───schemas
 ├───services
 ├───tests
+```
 
-** Docker Container **
+## Docker Container
 A aplicação é dockerizada de maneira eficiente utilizando o Docker. O Dockerfile inclui comandos otimizados e cache para garantir uma construção rápida e leve da imagem. Após a construção, a imagem é enviada para o Docker Hub, facilitando o deployment em ambientes de produção e desenvolvimento.
 para buildar a imagem localmente
 ```bash
 docker build -t converter_service .
 ```
 
-** GITOPS e K8S **
+## GITOPS e K8S
 Este repositório implementa o GitOps em conjunto com o Argo CD. Ele lê a pasta `k8s` na branch `gitops` e automaticamente aplica os manifests no meu cluster Kubernetes. Além disso, a imagem do deployment é automaticamente modificada toda vez que há um commit na branch `master`, refletindo o aumento de versão do projeto.
 
 Para acessar a branch

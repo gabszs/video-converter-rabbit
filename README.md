@@ -1,16 +1,7 @@
-<<<<<<< HEAD
-
+Este projeto é um consumidor RabbitMQ que processa vídeos de uma fila, extrai o áudio e envia uma notificação com um link de download temporário.
 
 ## Arquitetura das APIs
 ![Architecture Diagram](docs/converter-arch.png)
-
-🎧 MP3 Conversion API Gateway
-Bem-vindo ao MP3 Conversion API Gateway! Esta API é responsável por centralizar e gerenciar o processo de conversão de arquivos de áudio para o formato MP3. Ela faz a ponte entre diferentes microserviços especializados em tarefas como a conversão de arquivos, compressão e otimização de MP3, além da extração e inserção de metadados.
-=======
-# Projeto Consumer RabbitMQ
->>>>>>> 267e511575c855e508f667a655f151d4580e4347
-
-Este projeto é um consumidor RabbitMQ que processa vídeos de uma fila, extrai o áudio e envia uma notificação com um link de download temporário.
 
 ## Funcionalidades
 

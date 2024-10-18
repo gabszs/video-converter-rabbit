@@ -1,3 +1,8 @@
+
+
+## Arquitetura das APIs
+![Architecture Diagram](docs/converter-arch.png)
+
 🎧 MP3 Conversion API Gateway
 Bem-vindo ao MP3 Conversion API Gateway! Esta API é responsável por centralizar e gerenciar o processo de conversão de arquivos de áudio para o formato MP3. Ela faz a ponte entre diferentes microserviços especializados em tarefas como a conversão de arquivos, compressão e otimização de MP3, além da extração e inserção de metadados.
 

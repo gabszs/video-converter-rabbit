@@ -39,6 +39,7 @@ jobs:
   push-to-dockerhub:
     runs-on: ubuntu-latest
     needs: build-and-test
+    if: github.event_name == 'push'
 
     steps:
       - name: Checkout code
@@ -80,6 +81,7 @@ jobs:
   Update-Image-Tag-in-Deployment:
     runs-on: ubuntu-latest
     needs: [build-and-test, push-to-dockerhub]
+    if: github.event_name == 'push'
 
     steps:
       - name: Checkout Repository

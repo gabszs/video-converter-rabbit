@@ -4,6 +4,7 @@ version = "0.1.8"
 description = ""
 authors = ["GabrielCarvalho <gabrielcarvalho.workk@gmail.com>"]
 readme = "README.md"
+package-mode = false
 
 
 [tool.poetry.dependencies]

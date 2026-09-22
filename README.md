@@ -23,6 +23,13 @@ C:.
 ├───tests
 ```
 
+## Variáveis de ambiente
+As credenciais não são versionadas. Copie o arquivo de exemplo e preencha os valores do seu ambiente local:
+```bash
+cp dev.env.example dev.env
+```
+O `dev.env` está no `.gitignore` e é carregado automaticamente por `core/settings.py` quando `is_prod` não está definido.
+
 ## Docker Container
 A aplicação é dockerizada de maneira eficiente utilizando o Docker. O Dockerfile inclui comandos otimizados e cache para garantir uma construção rápida e leve da imagem. Após a construção, a imagem é enviada para o Docker Hub, facilitando o deployment em ambientes de produção e desenvolvimento.
 para buildar a imagem localmente
